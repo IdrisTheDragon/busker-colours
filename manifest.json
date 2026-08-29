@@ -1,0 +1,14 @@
+{
+    "uri": "musescore://notation/buskercolours",
+    "type": "macros",
+    "title": "Busker Colours",
+    "description": "This plugin colors notes in the selection depending on their pitch as per legal notes on a busker 20 note organ",
+    "category": "color-notes",
+    "thumbnail": "busker-colours.jpg",
+    "version":  "1",
+    "apiversion": 1,
+
+    "actions": [
+        { "path": "main.js" }
+    ]
+}
