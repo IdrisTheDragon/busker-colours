@@ -1,20 +1,50 @@
 
 
-const colors = [ // "#rrggbb" with rr, gg, and bb being the hex values for red, green, and blue, respectively
-                "#e21c48", // C
-                "#f26622", // C#/Db
-                "#f99d1c", // D
-                "#ffcc33", // D#/Eb
-                "#fff32b", // E
-                "#bcd85f", // F
-                "#62bc47", // F#/Gb
-                "#009c95", // G
-                "#0071bb", // G#/Ab
-                "#5e50a1", // A
-                "#8d5ba6", // A#/Bb
-                "#cf3e96"  // B
-             ]
+// "#rrggbb" with rr, gg, and bb being the hex values for red, green, and blue, respectively
 const black = "#000000"
+const illegal =  "#e21c48"
+
+const busker = new Map([
+    ["melody", { 
+        pitches = [
+            74, // D5
+            72, // C5 
+            70, // Bb5
+            69, // A5
+            67, // G4
+            65, // F4
+            64, // E4
+            63, // Eb4
+            62, // D4
+            60  // C4
+        ], 
+        colour = "#62bc47"
+    }],
+    ["accompaniment", { 
+        pitches = [
+            58, // Bb4
+            57, // A4
+            55, // G3
+            53, // F3
+            52, // E3
+            51, // Eb3
+            50  // D3
+        ], 
+        colour = "#0071bb"
+    }],
+    ["bass", { 
+        pitches = [
+            48,  // C3
+            46, // bB3
+            41 // F2
+        ], 
+        colour = "#5e50a1"
+    }]
+]);
+
+function info_log(message) {
+    api.log.info("busker-colours", message);
+}
 
 function main() {
     api.log.info("hello busker-colours");
@@ -42,24 +72,31 @@ function applyToNotesInSelection(func) {
 
 function colorNote(note) {
     // Get the base color for the note based on its pitch (modulo 12 for octave wrapping)
-    let base_color = colors[note.pitch % 12];
+    //  info_log(`pitch: ${note.pitch}`);
+
+    let note_colour = illegal;
+    let note_type = "illegal";
+    for  (const [range_type, range_details] of busker){
+        if (range_details.pitches.includes(note.pitch)) {
+            note_type = range_type;
+            note_colour = range_details.colour;
+            break
+        }
+    }
+
+    info_log(`note: ${nameNote(note)} pitch: ${note.pitch} type: ${note_type}`);
+
+
+   
 
     // Check if the note has an accidental (e.g., sharp or flat)
     if (note.accidental) {
-        // If the accidental already has the same color as the base color, change to black
-        if (note.accidental.color == base_color) {
-            base_color = black;
-        }
         // Set the accidental's color to the base color
-        note.accidental.color = base_color;
-
-    // If there is no accidental, but the note's color is equal to the base color, change it to black
-    } else if (note.color == base_color) {
-        base_color = black;
+        note.accidental.color = note_colour;
     }
 
     // Assign the final color to the note itself
-    note.color = base_color;
+    note.color = note_colour;
 
     // If the note has dots (augmentation dots), set each dot's color to match the note's color
     if (note.dots) {
@@ -70,3 +107,65 @@ function colorNote(note) {
         }
     }
 }
+
+function nameNote(note) {
+        switch (note.tpc) {
+        case -8: return "F♭♭♭"
+        case -7: return "C♭♭♭"
+        case -6: return "G♭♭♭"
+        case -5: return "D♭♭♭"
+        case -4: return "A♭♭♭"
+        case -3: return "E♭♭♭"
+        case -2: return "B♭♭♭"
+
+        case -1: return "F♭♭"
+        case  0: return "C♭♭"
+        case  1: return "G♭♭"
+        case  2: return "D♭♭"
+        case  3: return "A♭♭"
+        case  4: return "E♭♭"
+        case  5: return "B♭♭"
+
+        case  6: return "F♭"
+        case  7: return "C♭"
+        case  8: return "G♭"
+        case  9: return "D♭"
+        case 10: return "A♭"
+        case 11: return "E♭"
+        case 12: return "B♭"
+
+        case 13: return "F"
+        case 14: return "C"
+        case 15: return "G"
+        case 16: return "D"
+        case 17: return "A"
+        case 18: return "E"
+        case 19: return "B"
+
+        case 20: return "F♯"
+        case 21: return "C♯"
+        case 22: return "G♯"
+        case 23: return "D♯"
+        case 24: return "A♯"
+        case 25: return "E♯"
+        case 26: return "B♯"
+
+        case 27: return "F♯♯"
+        case 28: return "C♯♯"
+        case 29: return "G♯♯"
+        case 30: return "D♯♯"
+        case 31: return "A♯♯"
+        case 32: return "E♯♯"
+        case 33: return "B♯♯"
+
+        case 34: return "F♯♯"
+        case 35: return "C♯♯♯"
+        case 36: return "G♯♯♯"
+        case 37: return "D♯♯♯"
+        case 38: return "A♯♯♯"
+        case 39: return "E♯♯♯"
+        case 40: return "B♯♯♯"
+
+        default: return qsTr("?")
+        }
+    }
